@@ -25,3 +25,7 @@ export const createOrUpdateSEO = async (data: ISEO): Promise<ISEO> => {
 export const getSEOByUrl = async (canonicalUrl: string): Promise<ISEO | null> => {
   return await SEOModel.findOne({ canonicalUrl }).lean();
 };
+
+export const getAllSeo = async () => {
+  return await SEOModel.find().lean();
+};

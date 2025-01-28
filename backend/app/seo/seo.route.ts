@@ -10,6 +10,7 @@ const router = Router();
 // Routes for SEO operations
 router
   .post("/", isAuthenticated,roleAuth("ADMIN"),seoValidator.seoValidation,catchError, seoController.createOrUpdateSEO)
-  .get("/:url",seoValidator.getSeoValidation,catchError, seoController.getSEO);
+  .get("/:url",seoValidator.getSeoValidation,catchError, seoController.getSEO)
+  .get("/", isAuthenticated,catchError, seoController.getAllSeo);
 
 export default router;

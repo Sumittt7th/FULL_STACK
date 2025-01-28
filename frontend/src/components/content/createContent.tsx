@@ -43,11 +43,11 @@ const CreateContent: React.FC = () => {
       tags: [],
       author: "",
       status: "draft",
-      seoTitle: "",  // SEO Title field
-      seoDescription: "",  // SEO Description field
-      seoKeywords: "",  // SEO Keywords field
-      seoCanonicalUrl: "",  // SEO Canonical URL field
-      seoRobots: "index, follow",  // SEO Robots field
+      seoTitle: "", 
+      seoDescription: "",  
+      seoKeywords: "",  
+      seoCanonicalUrl: "",  
+      seoRobots: "index, follow", 
     },
   });
 
@@ -83,7 +83,7 @@ const CreateContent: React.FC = () => {
         seoDescription: seoQueryData?.data?.description || "",
         seoKeywords: seoQueryData?.data?.keywords?.join(", ") || "",
         seoCanonicalUrl: seoQueryData?.data?.canonicalUrl || "",
-        seoRobots: seoQueryData?.data?.robots || "index, follow",
+        seoRobots: seoQueryData?.data?.robots || "",
       });
       setMediaIds(contentData.data.media || []);
     }

@@ -29,3 +29,8 @@ export const getSEO = asyncHandler(async (req: Request, res: Response) => {
 
   res.send(createResponse(seoData));
 });
+
+export const getAllSeo = asyncHandler(async (req: Request, res: Response) => {
+  const seo = await seoService.getAllSeo();
+  res.send(createResponse(seo));
+});

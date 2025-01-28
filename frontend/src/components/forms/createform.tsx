@@ -68,7 +68,6 @@ const CreateForm: React.FC = () => {
         toast.success("Form created successfully!");
       }
       navigate("/forms");
-      refetch();
     } catch (error) {
       toast.error(`Failed to ${id ? "update" : "create"} form`);
     }

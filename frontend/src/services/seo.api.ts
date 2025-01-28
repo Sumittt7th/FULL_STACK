@@ -16,6 +16,9 @@ export const apiSEO = createApi({
     getSEO: builder.query({
       query: (url) => `seos/${url}`, // Get SEO by URL
     }),
+    getAllSEO: builder.query({
+      query: () => "seos/", // Get all seo
+    }),
   }),
 });
 
@@ -23,4 +26,5 @@ export const {
   // SEO
   useCreateOrUpdateSEOMutation,
   useGetSEOQuery,
+  useGetAllSEOQuery,
 } = apiSEO;

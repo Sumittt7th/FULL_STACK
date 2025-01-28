@@ -14,10 +14,12 @@ import ResetPasswordPage from './components/auth/resetPassword';
 import ForgotPasswordPage from './components/auth/forgotPassword';
 import AuthPage from './components/auth/authenticate';
 
-import CreateForm from './components/forms/createform';
-import GetAllForms from './components/forms/getallform';
-import CreateContent from './components/content/createContent';
-import GetAllContents from './components/content/getallContent';
+const CreateForm = React.lazy(() => import("./components/forms/createform"));
+const GetAllForms = React.lazy(() => import("./components/forms/getallform"));
+const CreateContent = React.lazy(() => import("./components/content/createContent"));
+const GetAllContents = React.lazy(() => import("./components/content/getallContent"));
+const AllMedia = React.lazy(() => import("./components/media/getallmedia"));
+const AllSEO = React.lazy(() => import("./components/seo/getallseo"));
 
 const AdminDashboard = React.lazy(() => import("./components/AdminDashboard"));
 const UserDashboard = React.lazy(() => import("./components/UserDashboard"));
@@ -104,12 +106,17 @@ function App() {
             </LazyComponent>
           }
         />
-         <Route path="/forms" element={<GetAllForms />} />
-         <Route path="/forms/create" element={<CreateForm />} />
-         <Route path="/forms/update/:id" element={<CreateForm />} />
-         <Route path="/contents" element={<GetAllContents />} />
-         <Route path="/contents/create" element={<CreateContent />} />
-         <Route path="/contents/update/:id" element={<CreateContent />} />
+         <Route path="/forms" element={<LazyComponent><GetAllForms /></LazyComponent>} />
+      <Route path="/forms/create" element={<LazyComponent><CreateForm /></LazyComponent>} />
+      <Route path="/forms/update/:id" element={<LazyComponent><CreateForm /></LazyComponent>} />
+
+      <Route path="/contents" element={<LazyComponent><GetAllContents /></LazyComponent>} />
+      <Route path="/contents/create" element={<LazyComponent><CreateContent /></LazyComponent>} />
+      <Route path="/contents/update/:id" element={<LazyComponent><CreateContent /></LazyComponent>} />
+
+      <Route path="/medias" element={<LazyComponent><AllMedia /></LazyComponent>} />
+      <Route path="/seo" element={<LazyComponent><AllSEO /></LazyComponent>} />
+
 
       </Route>
      
