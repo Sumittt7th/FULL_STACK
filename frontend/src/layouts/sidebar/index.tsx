@@ -11,12 +11,18 @@ import { NavLink } from "react-router-dom"; // Use NavLink for active link styli
 
 const sidebarItems = {
   ADMIN: [
-    { label: "All Users", path: "/users", icon: "people" },
-    { label: "Profile", path: "/profile", icon: "account_circle" },
+    { label: "All Users", path: "/users" },
+    { label: "Forms", path: "/forms" },
+    { label: "Contents", path: "/contents" },
+    { label: "Medias", path: "/medias" },
+    { label: "Seo", path: "/seo" },
+    { label: "Profile", path: "/profile" },
     { label: "Security", path: "/changePassword" },
   ],
   USER: [
     { label: "Profile", path: "/profile", icon: "account_circle" },
+    { label: "All Forms", path: "/forms"},
+    { label: "All Contents", path: "/contents" },
     { label: "Security", path: "/changePassword" },
   ],
 };

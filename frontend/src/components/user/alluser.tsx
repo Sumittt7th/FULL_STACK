@@ -1,103 +1,47 @@
 import React from "react";
 import { useGetAllUsersQuery } from "../../services/user.api"; // Replace with your actual API file
-import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Box,
-  Skeleton,
-} from "@mui/material";
+import { Container, Grid, Card, CardContent, Typography, Box, Skeleton } from "@mui/material";
 
 const AllUsers: React.FC = () => {
-  const { data, error, isLoading } = useGetAllUsersQuery();
+  const { data, isLoading, isError } = useGetAllUsersQuery();
 
-  // Skeleton loading state
-  if (isLoading) {
-    return (
-      <Box
-        component="main"
-        sx={{
-          padding: 3,
-          marginTop: "64px",
-          bgcolor: "background.paper",
-        }}
-      >
-        <Typography variant="h4" gutterBottom align="center">
-          All Users
-        </Typography>
+  return (
+    <Container>
+      {/* Header section */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", my: 3 }}>
+        <Typography variant="h4">All Users</Typography>
+      </Box>
 
-        {/* User List Grid - Skeleton Loading */}
-        <Grid container spacing={3} justifyContent="center">
+      {/* Display loading skeletons while data is loading */}
+      {isLoading ? (
+        <Grid container spacing={3} sx={{ mt: 3 }}>
           {[...Array(6)].map((_, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
+              <Skeleton variant="rectangular" height={200} />
+            </Grid>
+          ))}
+        </Grid>
+      ) : isError ? (
+        <Typography variant="h6" color="error" sx={{ mt: 5 }}>
+          Failed to load users.
+        </Typography>
+      ) : (
+        <Grid container spacing={3} sx={{ mt: 3 }}>
+          {data?.data?.map((user) => (
+            <Grid item xs={12} sm={6} md={4} key={user._id}>
               <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
-                  <Skeleton variant="text" width="80%" height={30} />
-                  <Skeleton
-                    variant="text"
-                    width="60%"
-                    height={20}
-                    sx={{ marginTop: 1 }}
-                  />
-                  <Skeleton
-                    variant="text"
-                    width="40%"
-                    height={20}
-                    sx={{ marginTop: 1 }}
-                  />
+                  <Typography variant="h6">{user.name}</Typography>
+                  <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                    {user.email}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
           ))}
         </Grid>
-      </Box>
-    );
-  }
-
-  if (error) return <div>Error: Unable to fetch users</div>;
-
-  // Validate data
-  const users = Array.isArray(data?.data) ? data.data : [];
-
-  if (users.length === 0) {
-    return <div>No users available</div>;
-  }
-
-  return (
-    <Box
-      component="main"
-      sx={{
-        padding: 3,
-        marginTop: "64px",
-        bgcolor: "background.paper",
-      }}
-    >
-      <Typography variant="h4" gutterBottom align="center">
-        All Users
-      </Typography>
-
-      {/* User List Grid */}
-      <Grid container spacing={3} justifyContent="center">
-        {users.map((user) => (
-          <Grid item xs={12} sm={6} md={4} key={user.email}>
-            <Card sx={{ boxShadow: 3 }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {user.name}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {user.email}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Subscription: {user.subscription ? "Active" : "Inactive"}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+      )}
+    </Container>
   );
 };
 

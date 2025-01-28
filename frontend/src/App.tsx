@@ -14,6 +14,11 @@ import ResetPasswordPage from './components/auth/resetPassword';
 import ForgotPasswordPage from './components/auth/forgotPassword';
 import AuthPage from './components/auth/authenticate';
 
+import CreateForm from './components/forms/createform';
+import GetAllForms from './components/forms/getallform';
+import CreateContent from './components/content/createContent';
+import GetAllContents from './components/content/getallContent';
+
 const AdminDashboard = React.lazy(() => import("./components/AdminDashboard"));
 const UserDashboard = React.lazy(() => import("./components/UserDashboard"));
 const Profile = React.lazy(() => import("./components/user/profile"));
@@ -99,7 +104,15 @@ function App() {
             </LazyComponent>
           }
         />
+         <Route path="/forms" element={<GetAllForms />} />
+         <Route path="/forms/create" element={<CreateForm />} />
+         <Route path="/forms/update/:id" element={<CreateForm />} />
+         <Route path="/contents" element={<GetAllContents />} />
+         <Route path="/contents/create" element={<CreateContent />} />
+         <Route path="/contents/update/:id" element={<CreateContent />} />
+
       </Route>
+     
     </Routes>
   );
 }
