@@ -6,6 +6,15 @@ import { Container, Grid, Card, CardContent, Typography, Button, Box, Paper } fr
 import { toast } from "react-toastify";
 import Skeleton from "@mui/material/Skeleton";
 
+/**
+ * `GetAllForms` is a React functional component that fetches and displays a list of forms.
+ * It uses the `useGetAllFormsQuery` hook to fetch forms and the `useDeleteFormMutation` 
+ * hook to handle the deletion of a form. It also conditionally renders buttons for updating 
+ * and deleting forms if the user has the `ADMIN` role.
+ * 
+ * @component
+ * @returns {JSX.Element} The UI for displaying a list of forms with options for updating or deleting.
+ */
 const GetAllForms: React.FC = () => {
   const { role } = useAppSelector((state) => state.auth);
   console.log({ role });
@@ -14,10 +23,18 @@ const GetAllForms: React.FC = () => {
   const [deleteForm, { isLoading: isDeleting }] = useDeleteFormMutation();
   const navigate = useNavigate();
 
+   /**
+   * Navigates to the form update page when the "Update" button is clicked.
+   * @param {string} formId - The ID of the form to update.
+   */
   const handleUpdate = (formId: string) => {
     navigate(`/forms/update/${formId}`);
   };
 
+  /**
+   * Handles the form deletion when the "Delete" button is clicked.
+   * @param {string} formId - The ID of the form to delete.
+   */
   const handleDelete = async (formId: string) => {
     try {
       await deleteForm(formId).unwrap();

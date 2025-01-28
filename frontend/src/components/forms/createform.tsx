@@ -5,6 +5,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCreateFormMutation, useUpdateFormMutation, useGetFormByIdQuery } from "../../services/form.api";
 import { toast } from "react-toastify";
 
+/**
+ * `CreateForm` is a React functional component that allows users to create or update a form.
+ * It uses `react-hook-form` for form management and validation. 
+ * The form consists of a title, description, and dynamically added fields with validation rules.
+ * 
+ * @component
+ * @returns {JSX.Element} The UI for creating or updating a form with field management.
+ */
 const CreateForm: React.FC = () => {
   const { id } = useParams(); // To get the form ID for update (if available)
   const navigate = useNavigate();

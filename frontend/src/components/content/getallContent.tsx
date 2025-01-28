@@ -20,14 +20,30 @@ import { toast } from "react-toastify";
 const GetAllContents: React.FC = () => {
   const { role } = useAppSelector((state) => state.auth);
 
+  /**
+ * `GetAllContents` is a React functional component that fetches and displays a list of all content.
+ * It also allows the admin user to create, update, or delete content.
+ * 
+ * @component
+ * @returns {JSX.Element} The UI displaying the list of all contents with actions for update and delete.
+ */
+
   const { data: contents, isLoading, isError,refetch } = useGetAllContentQuery();
   const [deleteContent, { isLoading: isDeleting }] = useDeleteContentMutation();
   const navigate = useNavigate();
 
+  /**
+   * Handle navigation to the content update page.
+   * @param {string} contentId - The ID of the content to update.
+   */
   const handleUpdate = (contentId: string) => {
     navigate(`/contents/update/${contentId}`);
   };
 
+   /**
+   * Handle the deletion of content.
+   * @param {string} contentId - The ID of the content to delete.
+   */
   const handleDelete = async (contentId: string) => {
     try {
       await deleteContent({ id: contentId }).unwrap();

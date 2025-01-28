@@ -1,3 +1,12 @@
+/**
+ * CreateContent component handles the creation and update of content.
+ * It allows users to input content details, upload media, and configure SEO settings.
+ * 
+ * @component
+ * @example
+ * return <CreateContent />
+ */
+
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -22,12 +31,26 @@ import {
   useGetSEOQuery,
 } from "../../services/seo.api";
 import { toast } from "react-toastify";
+import { useDropzone } from 'react-dropzone';
 
 const CreateContent: React.FC = () => {
   const { id } = useParams(); // To determine if updating existing content
   const navigate = useNavigate();
 
-  const [mediaIds, setMediaIds] = useState<string[]>([]);
+  /**
+ * State to manage uploaded media files.
+ * @type {Object[]}
+ * @property {string} id - The ID of the media file.
+ * @property {string} name - The name of the media file.
+ */
+
+  const [mediaFiles, setMediaFiles] = useState<{ id: string; name: string }[]>([]);
+
+/**
+ * State to manage the SEO ID.
+ * @type {string|null}
+ */
+  const [seoId, setSeoId] = useState<string | null>(null); // For saving the SEO ID
 
   const {
     control,
@@ -51,18 +74,27 @@ const CreateContent: React.FC = () => {
     },
   });
 
+
+  /**
+ * Fetches content data if editing an existing content item.
+ * @param {string} id - The ID of the content to fetch.
+ * @param {Object} options - Options for the fetch query.
+ */
   const { data: contentData, isLoading, isError, refetch } = useGetContentByIdQuery(id, {
     skip: !id, // Only fetch if editing
   });
 
+  /**
+ * Fetches SEO data related to the content if available.
+ * @param {string} seoUrl - The SEO URL linked to the content.
+ * @param {Object} options - Options for the fetch query.
+ */
   const { data: seoQueryData } = useGetSEOQuery(contentData?.data?.seoUrl, {
     skip: !contentData?.data?.seoUrl, // Skip SEO fetch if no URL
   });
 
-  const [createContent, { isLoading: isCreating }] =
-    useCreateContentMutation();
-  const [updateContent, { isLoading: isUpdating }] =
-    useUpdateContentMutation();
+  const [createContent, { isLoading: isCreating }] = useCreateContentMutation();
+  const [updateContent, { isLoading: isUpdating }] = useUpdateContentMutation();
 
   const [uploadMedia] = useUploadMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
@@ -85,7 +117,8 @@ const CreateContent: React.FC = () => {
         seoCanonicalUrl: seoQueryData?.data?.canonicalUrl || "",
         seoRobots: seoQueryData?.data?.robots || "",
       });
-      setMediaIds(contentData.data.media || []);
+      setMediaFiles(contentData.data.media.map((item: any) => ({ id: item._id, name: item.name })));
+      setSeoId(contentData?.data?.seoId || null); // Set the SEO ID if available
     }
   }, [contentData, seoQueryData, reset]);
 
@@ -101,11 +134,11 @@ const CreateContent: React.FC = () => {
         
         // Handle media upload response
         if (response.data && response.data._id) {
-          setMediaIds((prev) => [...prev, response.data._id]);
+          setMediaFiles((prev) => [...prev, { id: response.data._id, name: response.data.fileName }]);
         } else if (response.data && Array.isArray(response.data.data)) {
-          setMediaIds((prev) => [
+          setMediaFiles((prev) => [
             ...prev,
-            ...response.data.data.map((media: any) => media._id),
+            ...response.data.data.map((media: any) => ({ id: media._id, name: media.fileName })),
           ]);
         }
         
@@ -119,7 +152,7 @@ const CreateContent: React.FC = () => {
   const handleMediaDelete = async (mediaId: string) => {
     try {
       await deleteMedia(mediaId).unwrap();
-      setMediaIds((prev) => prev.filter((id) => id !== mediaId));
+      setMediaFiles((prev) => prev.filter((file) => file.id !== mediaId));
       toast.success("Media deleted successfully!");
     } catch {
       toast.error("Failed to delete media");
@@ -138,6 +171,7 @@ const CreateContent: React.FC = () => {
 
       const response = await createOrUpdateSeo(seoDataToSave).unwrap();
       toast.success("SEO saved successfully!");
+      setSeoId(response.data._id); // Save the returned SEO ID
     } catch {
       toast.error("Failed to save SEO");
     }
@@ -146,8 +180,8 @@ const CreateContent: React.FC = () => {
   const onSubmit = async (data: any) => {
     const contentPayload = {
       ...data,
-      media: mediaIds,
-      seoUrl: seoQueryData?.data?.url || null, // If you want to update the URL
+      media: mediaFiles.map(file => file.id), // Send only media IDs
+      seoId: seoId, // Include SEO ID in the content
     };
 
     try {
@@ -163,6 +197,37 @@ const CreateContent: React.FC = () => {
       toast.error(`Failed to ${id ? "update" : "create"} content`);
     }
   };
+
+  const handleMediaDrop = (acceptedFiles: File[]) => {
+    const formData = new FormData();
+    acceptedFiles.forEach((file) => {
+      formData.append("file", file);
+    });
+
+    // Upload each file
+    acceptedFiles.forEach(async (file) => {
+      try {
+        const response = await uploadMedia(formData).unwrap();
+        if (response.data && response.data._id) {
+          setMediaFiles((prev) => [...prev, { id: response.data._id, name: response.data.filename }]);
+        } else if (response.data && Array.isArray(response.data.data)) {
+          setMediaFiles((prev) => [
+            ...prev,
+            ...response.data.data.map((media: any) => ({ id: media._id, name: media.filename })),
+          ]);
+        }
+        toast.success("Media uploaded successfully!");
+      } catch {
+        toast.error("Failed to upload media");
+      }
+    });
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleMediaDrop,
+    multiple: true,
+    accept: 'image/*,video/*',  // You can customize the accepted file types
+  });
 
   return (
     <Paper sx={{ padding: 3 }}>
@@ -258,20 +323,18 @@ const CreateContent: React.FC = () => {
             {/* Media upload */}
             <Grid item xs={12}>
               <Typography variant="h6">Media</Typography>
-              <input
-                type="file"
-                multiple
-                onChange={handleMediaUpload}
-                accept="image/*,video/*"
-              />
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                  Drag & Drop or Choose Files
+                </Button>
+              </div>
+
               <ul>
-                {mediaIds.map((mediaId) => (
-                  <li key={mediaId}>
-                    {mediaId}
-                    <Button
-                      color="error"
-                      onClick={() => handleMediaDelete(mediaId)}
-                    >
+                {mediaFiles.map(({ id, name }) => (
+                  <li key={id}>
+                    {name}
+                    <Button color="error" onClick={() => handleMediaDelete(id)}>
                       Delete
                     </Button>
                   </li>
@@ -281,7 +344,7 @@ const CreateContent: React.FC = () => {
 
             {/* SEO fields */}
             <Grid item xs={12}>
-              <Typography variant="h6">SEO</Typography>
+              <Typography variant="h6">SEO Settings</Typography>
               <Controller
                 name="seoTitle"
                 control={control}
@@ -290,6 +353,7 @@ const CreateContent: React.FC = () => {
                     {...field}
                     label="SEO Title"
                     fullWidth
+                    variant="outlined"
                   />
                 )}
               />
@@ -301,6 +365,7 @@ const CreateContent: React.FC = () => {
                     {...field}
                     label="SEO Description"
                     fullWidth
+                    variant="outlined"
                   />
                 )}
               />
@@ -310,9 +375,9 @@ const CreateContent: React.FC = () => {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="SEO Keywords"
+                    label="SEO Keywords (comma separated)"
                     fullWidth
-                    helperText="Comma separated"
+                    variant="outlined"
                   />
                 )}
               />
@@ -322,8 +387,9 @@ const CreateContent: React.FC = () => {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="SEO Canonical URL"
+                    label="Canonical URL"
                     fullWidth
+                    variant="outlined"
                   />
                 )}
               />
@@ -335,31 +401,29 @@ const CreateContent: React.FC = () => {
                     {...field}
                     label="SEO Robots"
                     fullWidth
+                    variant="outlined"
                   />
                 )}
               />
               <Button
                 variant="contained"
-                color="primary"
+                color="secondary"
+                sx={{ mt: 2 }}
                 onClick={handleSubmit(handleSeoSave)}
               >
                 Save SEO
               </Button>
             </Grid>
 
+            {/* Submit Button */}
             <Grid item xs={12}>
               <Button
-                type="submit"
                 variant="contained"
                 color="primary"
-                fullWidth
+                type="submit"
                 disabled={isCreating || isUpdating}
               >
-                {isCreating || isUpdating
-                  ? "Saving..."
-                  : id
-                  ? "Update Content"
-                  : "Create Content"}
+                {id ? "Update Content" : "Create Content"}
               </Button>
             </Grid>
           </Grid>

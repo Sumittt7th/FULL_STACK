@@ -2,6 +2,13 @@ import React from "react";
 import { useGetAllSEOQuery } from "../../services/seo.api"; // Replace with your actual API file
 import { Container, Grid, Card, CardContent, Typography, Box, Skeleton } from "@mui/material";
 
+/**
+ * `AllSEO` is a React functional component that fetches and displays a list of SEO data.
+ * It uses the `useGetAllSEOQuery` hook to fetch the SEO data and handles the loading and error states.
+ * 
+ * @component
+ * @returns {JSX.Element} The UI for displaying a list of SEO items, including their title, description, keywords, canonical URL, and robots meta tag.
+ */
 const AllSEO: React.FC = () => {
   const { data, isLoading, isError } = useGetAllSEOQuery();
 

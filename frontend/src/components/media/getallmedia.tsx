@@ -2,6 +2,13 @@ import React from "react";
 import { useGetAllMediaQuery } from "../../services/media.api"; // Replace with your actual API file
 import { Container, Grid, Card, CardContent, Typography, Box, Skeleton } from "@mui/material";
 
+/**
+ * `AllMedia` is a React functional component that fetches and displays a list of media items.
+ * It uses the `useGetAllMediaQuery` hook to fetch the media data and handles the loading and error states.
+ * 
+ * @component
+ * @returns {JSX.Element} The UI for displaying a list of media items with their names, types, and upload timestamps.
+ */
 const AllMedia: React.FC = () => {
   const { data, isLoading, isError } = useGetAllMediaQuery();
 
