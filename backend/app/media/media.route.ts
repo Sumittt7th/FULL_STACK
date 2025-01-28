@@ -14,6 +14,7 @@ const router = Router();
 router
   .post("/upload", isAuthenticated,roleAuth("ADMIN"), upload.single("file"),catchError, mediaController.uploadMedia)
   .delete("/:id", isAuthenticated,roleAuth("ADMIN"),catchError, mediaController.deleteMedia)
-  .get("/", isAuthenticated,catchError, mediaController.getAllMedia);
+  .get("/", isAuthenticated,catchError, mediaController.getAllMedia)
+  .get("/:id", isAuthenticated,catchError, mediaController.getMediaById);
 
 export default router;

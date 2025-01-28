@@ -8,7 +8,7 @@ import * as formValidator from "./form.validation";
 const router = Router();
 
 router
-  .get("/", isAuthenticated, roleAuth("ADMIN"),catchError, formController.getAllForms)
+  .get("/", isAuthenticated,catchError, formController.getAllForms)
   .get("/:id", isAuthenticated,catchError, formController.getFormById)
   .post("/", isAuthenticated, roleAuth("ADMIN"),formValidator.createFormValidator,catchError, formController.createForm)
   .put("/:id", isAuthenticated, roleAuth("ADMIN"),catchError, formController.updateForm)

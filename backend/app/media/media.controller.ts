@@ -6,7 +6,16 @@ import { validationResult } from "express-validator";
 import MediaModel from './media.schema';
 import createHttpError from 'http-errors';
 
-// Upload media
+/**
+ * Uploads a media file to Cloudinary and saves the media details to the database.
+ * 
+ * @function uploadMedia
+ * @param {Request} req - Express request object. The file to be uploaded should be in `req.file`, and user details should be available in `req.user`.
+ * @param {Response} res - Express response object. Sends a response with the uploaded media file and a success message.
+ * @returns {void}
+ * 
+ * @throws {Error} If validation errors exist or if the file or user details are missing.
+ */
 export const uploadMedia = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -25,7 +34,16 @@ export const uploadMedia = asyncHandler(async (req: Request, res: Response) => {
   res.send(createResponse(media, "File uploaded successfully"));
 });
 
-// Delete media
+/**
+ * Deletes a media file from Cloudinary and removes its record from the database.
+ * 
+ * @function deleteMedia
+ * @param {Request} req - Express request object. The media ID should be in `req.params.id`.
+ * @param {Response} res - Express response object. Sends a response confirming the file has been deleted.
+ * @returns {void}
+ * 
+ * @throws {Error} If the media is not found in the database or if an error occurs during deletion.
+ */
 export const deleteMedia = asyncHandler(async (req: Request, res: Response) => {
   const mediaId = req.params.id;
 
@@ -40,8 +58,36 @@ export const deleteMedia = asyncHandler(async (req: Request, res: Response) => {
   res.send(createResponse(null, "File deleted successfully"));
 });
 
-// Get all media
+/**
+ * Retrieves all media records.
+ * 
+ * @function getAllMedia
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object. Sends a response with the list of all media files.
+ * @returns {void}
+ */
 export const getAllMedia = asyncHandler(async (req: Request, res: Response) => {
   const media = await mediaService.getAllMedia();
+  res.send(createResponse(media));
+});
+
+/**
+ * Retrieves a media file by its ID.
+ * 
+ * @function getMediaById
+ * @param {Request} req - Express request object. The media ID should be in `req.params.id`.
+ * @param {Response} res - Express response object. Sends a response with the media file data.
+ * @returns {void}
+ * 
+ * @throws {Error} If the media file is not found.
+ */
+export const getMediaById = asyncHandler(async (req: Request, res: Response) => {
+  const mediaId = req.params.id;
+  const media = await mediaService.getMediaById(mediaId);
+  
+  // If no media is found, throw an error
+  if (!media) {
+    throw new Error("Media not found");
+  }
   res.send(createResponse(media));
 });
